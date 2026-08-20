@@ -29,6 +29,11 @@ jobs:
         uses: actions/checkout@v7
         with:
           submodules: "recursive"
+          fetch-depth: 1
+          fetch-tags: true
+
+      - name: Mark workspace as safe for git
+        run: git config --global --add safe.directory "$GITHUB_WORKSPACE"
 
       - name: Build Dependency (ot_rcp)
         run: |
