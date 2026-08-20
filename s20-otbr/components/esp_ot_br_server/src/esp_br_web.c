@@ -2677,7 +2677,7 @@ static esp_err_t esp_otbr_ota_upload_web_post_handler(httpd_req_t *req)
         http_status = HTTPD_400;
         error = cJSON_CreateNumber((double)ret);
         result = create_ota_result("upload_failed", NULL);
-        message = cJSON_CreateString("Failed to process the uploaded web SPIFFS image. Ensure it is exactly 200 KB.");
+        message = cJSON_CreateString("Failed to process the uploaded web SPIFFS image.");
         goto respond;
     }
 
