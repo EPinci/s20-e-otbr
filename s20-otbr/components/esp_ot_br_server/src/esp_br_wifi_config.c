@@ -29,6 +29,7 @@
 #include "esp_mac.h"
 #include "esp_netif.h"
 #include "esp_wifi.h"
+#include "esp_wifi_default.h"
 #include "nvs.h"
 #include "nvs_config.h"
 #include "nvs_flash.h"
@@ -277,16 +278,12 @@ static void wifi_config_stop_softap(void)
         s_wifi_event_handler_instance = NULL;
     }
 
-    esp_wifi_stop();
+    ESP_ERROR_CHECK(esp_wifi_stop());
 
-    /* Always restore STA mode rather than calling esp_wifi_deinit(). If we deinit here, the
-     * managed component's s_wifi_initialized flag remains true, causing the next
-     * esp_ot_wifi_connect() to skip example_wifi_start() and fail with ESP_ERR_WIFI_NOT_INIT. */
-    esp_wifi_set_mode(WIFI_MODE_STA);
-    esp_wifi_start();
+    ESP_ERROR_CHECK(esp_wifi_deinit());
 
     if (s_ap_netif) {
-        esp_netif_destroy(s_ap_netif);
+        esp_netif_destroy_default_wifi(s_ap_netif);
         s_ap_netif = NULL;
     }
 

@@ -31,6 +31,8 @@ void esp_br_web_api_init(void);
 #define ESP_OT_REST_API_NODE_BORDERAGENTID_PATH "/node/ba-id"
 #define ESP_OT_REST_API_NODE_DATASET_ACTIVE_PATH "/node/dataset/active"
 #define ESP_OT_REST_API_NODE_DATASET_PENDING_PATH "/node/dataset/pending"
+#define ESP_OT_REST_API_NODE_EPSKC_STATE_PATH "/node/ba-epskc/state"
+#define ESP_OT_REST_API_NODE_EPSKC_KEY_PATH "/node/ba-epskc/key"
 #define ESP_OT_REST_API_NODE_COPROCESSOR_VERSION_PATH "/node/coprocessor/version"
 #define ESP_OT_REST_API_NODE_INFORMATION_PATH "/node/information"
 #define ESP_OT_REST_API_PROPERTIES_PATH "/get_properties"
@@ -352,6 +354,46 @@ void handle_ot_leader_weight_put_request(uint8_t weight);
  *      -   OT_ERROR_INVALID_STATE  :   Device is not attached as a router.
  */
 otError handle_ot_become_leader_request(void);
+
+/**
+ * @brief Get whether the Border Agent ephemeral key (ePSKc) feature is enabled.
+ *
+ * @return The cJSON string "enabled" or "disabled".
+ */
+cJSON *handle_ot_resource_node_epskc_state_request(void);
+
+/**
+ * @brief Enable or disable the Border Agent ephemeral key (ePSKc) feature.
+ *
+ * @param[in] request  A cJSON string, either "enable" or "disable".
+ *
+ * @return
+ *      -   OT_ERROR_NONE           :   On success.
+ *      -   OT_ERROR_INVALID_ARGS   :   The @param request is invalid.
+ */
+otError handle_ot_resource_node_epskc_state_put_request(const cJSON *request);
+
+/**
+ * @brief Get the status of the Border Agent ephemeral key (ePSKc) session.
+ *
+ * @return The cJSON object with "state" and "port".
+ */
+cJSON *handle_ot_resource_node_epskc_key_get_request(void);
+
+/**
+ * @brief Generate and activate an ephemeral key (ePSKc).
+ *
+ * @param[in]  request  An optional cJSON object with "lifetime" (milliseconds) and "port". May be NULL.
+ * @param[out] log      A cJSON object used to record the "ErrorCode" (200/400/409/500) of the operation.
+ *
+ * @return The cJSON object with "tap" and "port" on success, otherwise NULL.
+ */
+cJSON *handle_ot_resource_node_epskc_key_post_request(const cJSON *request, cJSON *log);
+
+/**
+ * @brief Deactivate the currently active ephemeral key (ePSKc), if any.
+ */
+void handle_ot_resource_node_epskc_key_delete_request(void);
 
 #ifdef __cplusplus
 }
