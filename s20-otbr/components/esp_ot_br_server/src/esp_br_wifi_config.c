@@ -538,7 +538,7 @@ static esp_err_t wifi_config_start_webserver(void)
     httpd_register_uri_handler(s_wifi_config_server, &submit_uri);
 
     // Register icon handlers to avoid 404 warnings
-    const char *icon_urls[] = {"/favicon.ico", "/apple-touch-icon.png", "/apple-touch-icon-precomposed.png",
+    const char *icon_urls[] = {"/otbr.png", "/apple-touch-icon.png", "/apple-touch-icon-precomposed.png",
                                "/apple-touch-icon-120x120.png", "/apple-touch-icon-120x120-precomposed.png"};
 
     for (int i = 0; i < sizeof(icon_urls) / sizeof(icon_urls[0]); i++) {

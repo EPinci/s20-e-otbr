@@ -6,7 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Thread Border Router - Mesh</title>
     <link rel="stylesheet" href="/static/style.css">
-    <link rel="icon" href="/favicon.ico">
+    <link rel="icon" href="/otbr.png">
 </head>
 
 <body>
@@ -23,8 +23,10 @@
             </div>
             <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;font-size:13px">
                 <span><b>Network:</b> <span id="meshNetworkName" style="font-weight:600">-</span></span>
-                <span style="text-align:center"><b>Role:</b> <span id="meshStateLabel" style="font-weight:600">-</span></span>
-                <span style="text-align:right"><b>RLOC16:</b> <span id="meshRloc16" style="font-family:monospace">-</span></span>
+                <span style="text-align:center"><b>Role:</b> <span id="meshStateLabel"
+                        style="font-weight:600">-</span></span>
+                <span style="text-align:right"><b>RLOC16:</b> <span id="meshRloc16"
+                        style="font-family:monospace">-</span></span>
             </div>
         </div>
 
@@ -145,7 +147,6 @@
         </div>
 
     </div>
-    <div class="footer">Copyright &copy; 2026 Espressif Systems. All rights reserved.</div>
 
     <!-- Join Modal -->
     <div class="modal-overlay" id="joinModal">
@@ -181,6 +182,7 @@
         </div>
     </div>
 
+    <div class="footer">An open source project by EPinci</div>
     <script src="/static/api.js"></script>
     <script>
         function toggleVis(btn) {

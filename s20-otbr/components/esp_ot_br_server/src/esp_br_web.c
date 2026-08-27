@@ -3238,7 +3238,7 @@ exit:
 }
 
 /**
- * @brief Provide the favicon for GUI.
+ * @brief Provide the OTBR icon for GUI.
  *
  * @param[in] req The request from client's browser.
  * @return
@@ -3248,15 +3248,15 @@ exit:
  *      -   ESP_ERR_HTTPD_RESP_SEND     : Error in raw send
  *      -   ESP_ERR_HTTPD_INVALID_REQ   : Invalid request
  */
-static esp_err_t favicon_get_handler(httpd_req_t *req)
+static esp_err_t otbr_png_get_handler(httpd_req_t *req)
 {
-    extern const unsigned char favicon_ico_start[] asm("_binary_favicon_ico_start");
-    extern const unsigned char favicon_ico_end[] asm("_binary_favicon_ico_end");
-    const size_t favicon_ico_size = (favicon_ico_end - favicon_ico_start);
+    extern const unsigned char otbr_png_start[] asm("_binary_otbr_png_start");
+    extern const unsigned char otbr_png_end[] asm("_binary_otbr_png_end");
+    const size_t otbr_png_size = (otbr_png_end - otbr_png_start);
 
-    ESP_RETURN_ON_ERROR(httpd_resp_set_type(req, "image/x-icon"), WEB_TAG, "Failed to set http respond type");
+    ESP_RETURN_ON_ERROR(httpd_resp_set_type(req, "image/png"), WEB_TAG, "Failed to set http respond type");
     httpd_resp_set_hdr(req, "Cache-Control", "public, max-age=3600");
-    ESP_RETURN_ON_ERROR(httpd_resp_send(req, (const char *)favicon_ico_start, favicon_ico_size), WEB_TAG,
+    ESP_RETURN_ON_ERROR(httpd_resp_send(req, (const char *)otbr_png_start, otbr_png_size), WEB_TAG,
                         "Failed to send http respond");
     return ESP_OK;
 }
@@ -3416,9 +3416,9 @@ static esp_err_t default_urls_get_handler(httpd_req_t *req)
         return index_html_get_handler(req, index_path);
     }
 
-    /* Favicon: served from embedded binary */
-    if (strcmp(info.file_name, "/favicon.ico") == 0) {
-        return favicon_get_handler(req);
+    /* OTBR icon: served from embedded binary */
+    if (strcmp(info.file_name, "/otbr.png") == 0) {
+        return otbr_png_get_handler(req);
     }
 
     /* Extension-based routing for SPIFFS files */
