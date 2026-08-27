@@ -19,7 +19,7 @@ jobs:
       contents: read
 
     container:
-      image: espressif/idf:v6.0.2
+      image: espressif/idf:v6.1
 
     env:
       IDF_PATH: /opt/esp/idf
