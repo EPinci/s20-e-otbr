@@ -28,14 +28,27 @@ jobs:
       - name: Checkout repo
         uses: actions/checkout@v7
         with:
-          submodules: "recursive"
+          #submodules: "recursive"
           fetch-depth: 1
           fetch-tags: true
 
-      - name: Mark workspace as safe for git
-        run: git config --global --add safe.directory "$GITHUB_WORKSPACE"
+      - name: Prep repo for building
+        run: |
+          git config --global --add safe.directory "$GITHUB_WORKSPACE"
+          git config --global --add safe.directory "$IDF_PATH"
+          git submodule update --init --recursive esp-thread-br
 
-      - name: Build Dependency (ot_rcp)
+      - name: Apply ESP-IDF patches
+        shell: bash
+        run: |
+          shopt -s nullglob
+          patches=("$GITHUB_WORKSPACE"/*.patch)
+          for patch in "${patches[@]}"; do
+            echo "Applying $(basename "$patch")"
+            git -C "$IDF_PATH" apply "$patch"
+          done
+
+      - name: Build OpenThread RCP Firmware
         run: |
           . $IDF_PATH/export.sh
           cd $IDF_PATH/examples/openthread/ot_rcp
