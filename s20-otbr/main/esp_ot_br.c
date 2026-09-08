@@ -12,7 +12,6 @@
 #include "esp_netif.h"
 #include "esp_openthread.h"
 #include "esp_openthread_border_router.h"
-#include "esp_openthread_lock.h"
 #include "esp_openthread_netif_glue.h"
 #include "esp_openthread_types.h"
 #include "esp_ot_config.h"
@@ -24,9 +23,6 @@
 #include "nvs_flash.h"
 #include "driver/uart.h"
 #include "freertos/FreeRTOS.h"
-#include "freertos/task.h"
-#include "openthread/border_routing.h"
-#include "openthread/multi_ail_detection.h"
 #include "openthread/platform/radio.h"
 #include "openthread/thread_ftd.h"
 #include "openthread/trel.h"
@@ -43,42 +39,8 @@
 
 #define TAG "s20-otbr"
 
-#define BR_RECOVERY_TASK_STACK_SIZE 6144
-#define BR_RECOVERY_TASK_PRIORITY 4
-
 extern const uint8_t server_cert_pem_start[] asm("_binary_ca_cert_pem_start");
 extern const uint8_t server_cert_pem_end[] asm("_binary_ca_cert_pem_end");
-
-static bool s_br_recovery_pending;
-
-static void br_recovery_task(void *arg)
-{
-    (void)arg;
-
-    ESP_LOGI(TAG, "Restarting border routing discovery after Ethernet reconnect");
-    esp_openthread_lock_acquire(portMAX_DELAY);
-    otInstance *instance = esp_openthread_get_instance();
-    bool multi_ail_enabled = otBorderRoutingIsMultiAilDetectionEnabled(instance);
-    if (multi_ail_enabled) {
-        otBorderRoutingSetMultiAilDetectionEnabled(instance, false);
-    }
-    otError error = otBorderRoutingSetEnabled(instance, false);
-    if (error == OT_ERROR_NONE) {
-        error = otBorderRoutingSetEnabled(instance, true);
-    }
-    if (multi_ail_enabled) {
-        otBorderRoutingSetMultiAilDetectionEnabled(instance, true);
-    }
-    esp_openthread_lock_release();
-
-    if (error == OT_ERROR_NONE) {
-        ESP_LOGI(TAG, "Border routing discovery restarted successfully");
-    } else {
-        ESP_LOGE(TAG, "Failed to restart border routing discovery: %d", error);
-    }
-
-    vTaskDelete(NULL);
-}
 
 static esp_err_t init_spiffs(void)
 {
@@ -124,7 +86,6 @@ static void eth_event_handler(void *arg, esp_event_base_t event_base, int32_t ev
     case ETHERNET_EVENT_DISCONNECTED:
         set_nwk_led_color(false, false, false);
         ESP_LOGI(TAG, "Ethernet Link Down");
-        s_br_recovery_pending = esp_openthread_get_backbone_netif() != NULL;
         break;
     case ETHERNET_EVENT_START:
         ESP_LOGI(TAG, "Ethernet Started");
@@ -149,17 +110,6 @@ static void got_ip_event_handler(void *arg, esp_event_base_t event_base, int32_t
     ESP_LOGI(TAG, "ETHMASK:" IPSTR, IP2STR(&ip_info->netmask));
     ESP_LOGI(TAG, "ETHGW:" IPSTR, IP2STR(&ip_info->gw));
     ESP_LOGI(TAG, "~~~~~~~~~~~");
-
-    if (s_br_recovery_pending && event->esp_netif == esp_openthread_get_backbone_netif()) {
-        BaseType_t task_created = xTaskCreate(br_recovery_task, "br_recovery", BR_RECOVERY_TASK_STACK_SIZE, NULL,
-                                              BR_RECOVERY_TASK_PRIORITY, NULL);
-        if (task_created == pdPASS) {
-            s_br_recovery_pending = false;
-            ESP_LOGI(TAG, "Ethernet IPv4 ready; scheduled border routing recovery");
-        } else {
-            ESP_LOGE(TAG, "Failed to create border routing recovery task");
-        }
-    }
 }
 
 static void thread_event_handler(void *esp_netif, esp_event_base_t event_base, int32_t event_id, void *data)
