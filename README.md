@@ -10,7 +10,7 @@ This is a minimalist, performance oriented firmare that supports:
     - TREL support
     - BBR support
     - Home Assistant OTBR integration
-- [esp-thread-br](https://github.com/espressif/esp-thread-br) -> main @ cd0b64f
+- [esp-thread-br](https://github.com/espressif/esp-thread-br) -> main @ 0bad9f1
     - Used as base framework
     - Implemented only wired connectivity in order to keep the radio for Thread use only
     - Forked basic Web UI to add logs, remote/local OTA and more
