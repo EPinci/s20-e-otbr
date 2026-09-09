@@ -70,6 +70,9 @@
                     details = 'Mask: ' + escapeHtml(a.netmask) + ' &nbsp; GW: ' + escapeHtml(a.gateway);
                 } else if (a.origin === 'slaac') {
                     details = 'SLAAC';
+                    if (a.deprecated) {
+                        details += ' &nbsp;deprecated';
+                    }
                 }
                 html += '<tr><td style="font-family:\'Courier New\',Consolas,monospace;font-size:12px">' +
                     escapeHtml(a.address) +

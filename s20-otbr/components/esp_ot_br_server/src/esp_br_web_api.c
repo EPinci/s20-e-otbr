@@ -1574,6 +1574,7 @@ cJSON *handle_ethernet_ipaddr_request(void)
             cJSON_AddStringToObject(entry, "type", "ipv6");
             cJSON_AddStringToObject(entry, "origin", origin);
             cJSON_AddBoolToObject(entry, "slaac", is_slaac);
+            cJSON_AddBoolToObject(entry, "deprecated", ip6_addr_isdeprecated(netif_ip6_addr_state(lwip_netif, i)));
             cJSON_AddItemToArray(arr, entry);
         }
     } else {
